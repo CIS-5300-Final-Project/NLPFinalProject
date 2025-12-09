@@ -1,0 +1,36 @@
+Epoch 0: train_loss=1.3962 | val_loss=1.4853 | val_acc=0.5113
+
+=== Per-label Accuracy ===
+neutral    | acc=0.9000 | count=470
+joy        | acc=0.5031 | count=163
+surprise   | acc=0.3333 | count=150
+anger      | acc=0.0784 | count=153
+sadness    | acc=0.0000 | count=111
+disgust    | acc=0.0000 | count=22
+fear       | acc=0.0000 | count=40
+
+Overall accuracy: 0.5113
+Epoch 1: train_loss=1.2467 | val_loss=1.4042 | val_acc=0.5437
+
+=== Per-label Accuracy ===
+neutral    | acc=0.9383 | count=470
+joy        | acc=0.4479 | count=163
+surprise   | acc=0.3400 | count=150
+anger      | acc=0.2484 | count=153
+sadness    | acc=0.0000 | count=111
+disgust    | acc=0.0000 | count=22
+fear       | acc=0.0000 | count=40
+
+Overall accuracy: 0.5437
+Epoch 2: train_loss=1.1607 | val_loss=1.4490 | val_acc=0.5257
+
+=== Per-label Accuracy ===
+neutral    | acc=0.9128 | count=470
+joy        | acc=0.4417 | count=163
+surprise   | acc=0.2000 | count=150
+anger      | acc=0.2941 | count=153
+sadness    | acc=0.0631 | count=111
+disgust    | acc=0.0000 | count=22
+fear       | acc=0.0000 | count=40
+
+Overall accuracy: 0.5257
