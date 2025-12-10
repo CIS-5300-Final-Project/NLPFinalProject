@@ -1,5 +1,5 @@
 """
-Evaluation Script for Ekman Emotion Classification
+Evaluation Script for GoEmotions Classification (28 Labels)
 
 This script evaluates multiple models on the presidential speeches dataset:
 1. RoBERTa-base-go_emotions (pre-trained baseline)
@@ -25,44 +25,18 @@ from transformers import (
 from sklearn.metrics import accuracy_score, precision_recall_fscore_support
 from tqdm import tqdm
 
-# Ekman emotion labels
-EKMAN_LABELS = ['anger', 'disgust', 'fear', 'joy', 'sadness', 'surprise', 'neutral']
-
-# Mapping from GoEmotions (28 labels) to Ekman (7 labels) for RoBERTa model
-GOEMOTIONS_TO_EKMAN = {
-    'anger': 'anger',
-    'annoyance': 'anger',
-    'disapproval': 'anger',
-    'disgust': 'disgust',
-    'fear': 'fear',
-    'nervousness': 'fear',
-    'joy': 'joy',
-    'amusement': 'joy',
-    'approval': 'joy',
-    'excitement': 'joy',
-    'gratitude': 'joy',
-    'love': 'joy',
-    'optimism': 'joy',
-    'relief': 'joy',
-    'pride': 'joy',
-    'admiration': 'joy',
-    'desire': 'joy',
-    'caring': 'joy',
-    'sadness': 'sadness',
-    'disappointment': 'sadness',
-    'embarrassment': 'sadness',
-    'grief': 'sadness',
-    'remorse': 'sadness',
-    'surprise': 'surprise',
-    'realization': 'surprise',
-    'confusion': 'surprise',
-    'curiosity': 'surprise',
-    'neutral': 'neutral',
-}
+# All 28 GoEmotions labels
+GOEMOTIONS_LABELS = [
+    'admiration', 'amusement', 'anger', 'annoyance', 'approval', 'caring',
+    'confusion', 'curiosity', 'desire', 'disappointment', 'disapproval',
+    'disgust', 'embarrassment', 'excitement', 'fear', 'gratitude', 'grief',
+    'joy', 'love', 'nervousness', 'optimism', 'pride', 'realization',
+    'relief', 'remorse', 'sadness', 'surprise', 'neutral'
+]
 
 
-def load_presidential_data(path="data/presidential_speeches_ekman_labeled.csv"):
-    """Load the presidential speeches dataset with Ekman labels."""
+def load_presidential_data(path="data/presidential_speeches_goemotions_labeled.csv"):
+    """Load the presidential speeches dataset with GoEmotions labels."""
     df = pd.read_csv(path)
     print(f"[INFO] Loaded {len(df)} presidential speeches")
     
@@ -107,7 +81,7 @@ def evaluate_simple_baseline(df):
 def evaluate_roberta_goemotions(df, text_col, device, batch_size=8):
     """
     Evaluate the SamLowe/roberta-base-go_emotions model.
-    Maps 28 GoEmotions to 7 Ekman emotions.
+    Directly uses all 28 GoEmotions labels.
     """
     print("\n[INFO] Loading RoBERTa-base-go_emotions model...")
     
@@ -142,16 +116,9 @@ def evaluate_roberta_goemotions(df, text_col, device, batch_size=8):
             outputs = model(**inputs)
             probs = torch.sigmoid(outputs.logits).cpu().numpy()[0]
         
-        # Aggregate to Ekman emotions
-        ekman_probs = {label: 0.0 for label in EKMAN_LABELS}
-        for i, prob in enumerate(probs):
-            goemotions_label = id2label[i]
-            if goemotions_label in GOEMOTIONS_TO_EKMAN:
-                ekman_label = GOEMOTIONS_TO_EKMAN[goemotions_label]
-                ekman_probs[ekman_label] = max(ekman_probs[ekman_label], prob)
-        
-        # Predict the emotion with highest probability
-        pred = max(ekman_probs, key=ekman_probs.get)
+        # Get the emotion with highest probability
+        label_probs = {id2label[i]: prob for i, prob in enumerate(probs)}
+        pred = max(label_probs, key=label_probs.get)
         predictions.append(pred)
     
     return gold_labels, predictions, "RoBERTa-base-go_emotions"
@@ -160,14 +127,14 @@ def evaluate_roberta_goemotions(df, text_col, device, batch_size=8):
 def evaluate_bert_model(df, text_col, model_path, device, batch_size=8):
     """
     Evaluate a custom BERT .pt model.
-    Assumes the model is a BertForSequenceClassification with 7 Ekman labels.
+    Assumes the model is a BertForSequenceClassification with 28 GoEmotions labels.
     """
     print(f"\n[INFO] Loading BERT model from {model_path}...")
     
     tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
     model = BertForSequenceClassification.from_pretrained(
         'bert-base-uncased',
-        num_labels=len(EKMAN_LABELS),
+        num_labels=len(GOEMOTIONS_LABELS),
         problem_type="multi_label_classification"
     )
     
@@ -201,7 +168,7 @@ def evaluate_bert_model(df, text_col, model_path, device, batch_size=8):
             probs = torch.sigmoid(outputs.logits).cpu().numpy()[0]
         
         # Map to emotion labels and predict highest
-        label_probs = {label: prob for label, prob in zip(EKMAN_LABELS, probs)}
+        label_probs = {label: prob for label, prob in zip(GOEMOTIONS_LABELS, probs)}
         pred = max(label_probs, key=label_probs.get)
         predictions.append(pred)
     
@@ -271,7 +238,7 @@ Examples:
     parser.add_argument(
         '--data', 
         type=str, 
-        default='data/presidential_speeches_ekman_labeled.csv',
+        default='data/presidential_speeches_goemotions_labeled.csv',
         help='Path to the labeled presidential speeches CSV'
     )
     parser.add_argument(
