@@ -1,0 +1,43 @@
+{
+  "baseline": {
+    "hyperparameters": {
+      "learning_rate": 2e-05,
+      "batch_size": 16,
+      "epochs": 3,
+      "warmup_steps": 0,
+      "weight_decay": 0.0,
+      "dropout": 0.1
+    },
+    "test_metrics": {
+      "f1_micro": 0.5881582639603404,
+      "f1_macro": 0.42687239698087376,
+      "loss": 0.08365059488398187
+    }
+  },
+  "tuned": {
+    "hyperparameters": {
+      "learning_rate": 4.892555662298133e-05,
+      "batch_size": 16,
+      "epochs": 5,
+      "warmup_ratio": 0.16554719818529223,
+      "weight_decay": 0.03480486066051946,
+      "dropout": 0.24407195132826082
+    },
+    "test_metrics": {
+      "f1_micro": 0.5777663141604333,
+      "f1_macro": 0.4784228517478094,
+      "loss": 0.08771152396083755
+    }
+  },
+  "improvement": {
+    "f1_micro_pct": -1.7668628389123215,
+    "f1_macro_pct": 12.076314873375473,
+    "loss_pct": -4.8546326329034875
+  },
+  "optuna_study": {
+    "n_trials": 10,
+    "n_completed": 4,
+    "best_trial_number": 4,
+    "best_val_f1": 0.4707874428934819
+  }
+}

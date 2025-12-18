@@ -124,19 +124,50 @@ def evaluate_roberta_goemotions(df, text_col, device, batch_size=8):
     return gold_labels, predictions, "RoBERTa-base-go_emotions"
 
 
-def evaluate_bert_model(df, text_col, model_path, device, batch_size=8):
+def evaluate_custom_model(df, text_col, model_path, device, batch_size=8):
     """
-    Evaluate a custom BERT .pt model.
-    Assumes the model is a BertForSequenceClassification with 28 GoEmotions labels.
+    Evaluate a custom .pt model (BERT or DeBERTa).
+    Assumes the model is a SequenceClassification model with 28 GoEmotions labels.
     """
-    print(f"\n[INFO] Loading BERT model from {model_path}...")
+    print(f"\n[INFO] Loading model from {model_path}...")
     
-    tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-    model = BertForSequenceClassification.from_pretrained(
-        'bert-base-uncased',
-        num_labels=len(GOEMOTIONS_LABELS),
-        problem_type="multi_label_classification"
-    )
+    # Determine model type based on filename
+    if "deberta" in model_path.lower():
+        base_model = "microsoft/deberta-v3-base"
+        print(f"[INFO] Detected DeBERTa model (base: {base_model})")
+        tokenizer = AutoTokenizer.from_pretrained(base_model)
+        model = AutoModelForSequenceClassification.from_pretrained(
+            base_model,
+            num_labels=len(GOEMOTIONS_LABELS),
+            problem_type="multi_label_classification"
+        )
+    elif "roberta" in model_path.lower():
+        base_model = "roberta-base"
+        print(f"[INFO] Detected RoBERTa model (base: {base_model})")
+        tokenizer = AutoTokenizer.from_pretrained(base_model)
+        model = AutoModelForSequenceClassification.from_pretrained(
+            base_model,
+            num_labels=len(GOEMOTIONS_LABELS),
+            problem_type="multi_label_classification"
+        )
+    elif "modernbert" in model_path.lower():
+        base_model = "answerdotai/ModernBERT-base"
+        print(f"[INFO] Detected ModernBERT model (base: {base_model})")
+        tokenizer = AutoTokenizer.from_pretrained(base_model)
+        model = AutoModelForSequenceClassification.from_pretrained(
+            base_model,
+            num_labels=len(GOEMOTIONS_LABELS),
+            problem_type="multi_label_classification"
+        )
+    else:
+        base_model = "bert-base-uncased"
+        print(f"[INFO] Detected BERT model (base: {base_model})")
+        tokenizer = BertTokenizer.from_pretrained(base_model)
+        model = BertForSequenceClassification.from_pretrained(
+            base_model,
+            num_labels=len(GOEMOTIONS_LABELS),
+            problem_type="multi_label_classification"
+        )
     
     # Load state dict
     state_dict = torch.load(model_path, map_location=device)
@@ -148,7 +179,7 @@ def evaluate_bert_model(df, text_col, model_path, device, batch_size=8):
     predictions = []
     
     print("[INFO] Running inference...")
-    for idx in tqdm(range(len(df)), desc=f"BERT Inference ({model_path})"):
+    for idx in tqdm(range(len(df)), desc=f"Inference ({model_path})"):
         text = str(df.iloc[idx][text_col])[:5000]  # Truncate
         gold = df.iloc[idx]['primary_emotion'].lower()
         gold_labels.append(gold)
@@ -173,7 +204,7 @@ def evaluate_bert_model(df, text_col, model_path, device, batch_size=8):
         predictions.append(pred)
     
     model_name = model_path.split('/')[-1].split('\\')[-1]
-    return gold_labels, predictions, f"BERT Model ({model_name})"
+    return gold_labels, predictions, f"Custom Model ({model_name})"
 
 
 def compute_metrics(gold_labels, predictions, model_name):
@@ -301,7 +332,7 @@ Examples:
         print(f"Evaluating: {model_path}")
         print("=" * 50)
         try:
-            gold, preds, name = evaluate_bert_model(df, text_col, model_path, device, args.batch_size)
+            gold, preds, name = evaluate_custom_model(df, text_col, model_path, device, args.batch_size)
             results = compute_metrics(gold, preds, name)
             all_results.append(results)
             print(f"Accuracy: {results['accuracy']:.4f}, F1 (Macro): {results['f1_macro']:.4f}")
