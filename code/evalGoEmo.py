@@ -161,11 +161,11 @@ def main():
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
     
-    # Find all .pt files excluding 'trial'
-    model_files = [f for f in glob.glob("*.pt") if "trial" not in f.lower()]
+    # Find all .pt files excluding 'trial' in the output directory
+    model_files = [f for f in glob.glob("../output/*.pt") if "trial" not in f.lower()]
     
     if not model_files:
-        print("No model files found!")
+        print("No model files found in ../output/!")
         return
 
     print(f"Found {len(model_files)} models to evaluate: {model_files}")

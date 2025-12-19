@@ -22,7 +22,7 @@ GOEMOTIONS_LABELS = [
     'relief', 'remorse', 'sadness', 'surprise', 'neutral'
 ]
 
-def load_presidential_data(path="data/presidential_speeches_goemotions_labeled.csv"):
+def load_presidential_data(path="../data/presidential_speeches_goemotions_labeled.csv"):
     """Load the presidential speeches dataset with GoEmotions labels."""
     try:
         df = pd.read_csv(path)
@@ -148,10 +148,12 @@ def compute_metrics(gold_labels, predictions, model_name):
         'predictions': predictions # Store for error analysis
     }
 
-def generate_error_report(df, text_col, all_results, filename="error_analysis_data.txt"):
+def generate_error_report(df, text_col, all_results, output_dir="../output"):
     """
     Generates a text file comparing the Best Custom Model vs. Published Baseline.
     """
+    import os
+    filename = os.path.join(output_dir, "error_analysis_data.txt")
     print(f"\n[INFO] Generating error analysis report to {filename}...")
     
     # 1. Identify Baseline (Look for "SamLowe" in the name)
@@ -242,7 +244,8 @@ def generate_error_report(df, text_col, all_results, filename="error_analysis_da
 def main():
     parser = argparse.ArgumentParser(description='Evaluate emotion classification models.')
     parser.add_argument('model_files', nargs='*', help='Paths to .pt model files')
-    parser.add_argument('--data', type=str, default='data/presidential_speeches_goemotions_labeled.csv')
+    parser.add_argument('--data', type=str, default='../data/presidential_speeches_goemotions_labeled.csv')
+    parser.add_argument('--output-dir', type=str, default='../output', help='Directory for output files')
     parser.add_argument('--skip-roberta', action='store_true', help='Skip RoBERTa baseline')
     args = parser.parse_args()
     
@@ -280,7 +283,7 @@ def main():
     print("="*60)
 
     # Generate Error Report
-    generate_error_report(df, text_col, all_results)
+    generate_error_report(df, text_col, all_results, args.output_dir)
 
 if __name__ == "__main__":
     main()

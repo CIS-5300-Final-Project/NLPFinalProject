@@ -27,8 +27,8 @@ class BaselineEmotionClassifier:
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("--data", type=str, default="data/1presidential_speeches_with_metadata.xlsx")
-    parser.add_argument("--output", type=str, default="baseline_predictions.csv")
+    parser.add_argument("--data", type=str, default="../data/1presidential_speeches_with_metadata.xlsx")
+    parser.add_argument("--output", type=str, default="../output/baseline_predictions.csv")
     args = parser.parse_args()
 
     train_df, val_df, test_df = load_and_split_data(args.data)
