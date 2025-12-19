@@ -1,0 +1,113 @@
+=== ERROR ANALYSIS RAW DATA ===
+Baseline Model: SamLowe/RoBERTa-base-go_emotions
+Best Custom Model: best_presidential_roberta_model.pt
+===============================
+
+--- TOP 10 CONFUSED PAIRS (Best Model) ---
+Format: (True Label) -> (Predicted Label): Count
+True: [approval] -> Pred: [neutral] : 63 times
+True: [optimism] -> Pred: [neutral] : 45 times
+True: [gratitude] -> Pred: [neutral] : 31 times
+True: [neutral] -> Pred: [gratitude] : 23 times
+True: [neutral] -> Pred: [approval] : 18 times
+True: [approval] -> Pred: [gratitude] : 13 times
+True: [admiration] -> Pred: [neutral] : 10 times
+True: [neutral] -> Pred: [sadness] : 8 times
+True: [optimism] -> Pred: [approval] : 6 times
+True: [curiosity] -> Pred: [neutral] : 6 times
+
+--- IMPROVEMENTS (Baseline Wrong -> Custom Correct) ---
+Example 1:
+Text: As long as I am President of the United States, Iran will never be allowed to have a nuclear weapon. Good morning.  I’m pleased to inform you: The American people should be extremely grateful and happ...
+Gold: neutral
+Baseline Pred: admiration (WRONG)
+Custom Pred:   neutral (CORRECT)
+--------------------
+Example 2:
+Text: Last night, the United States brought the world’s number one terrorist leader to justice.  Abu Bakr al-Baghdadi is dead.   He was the founder and leader of ISIS, the most ruthless and violent terror o...
+Gold: gratitude
+Baseline Pred: neutral (WRONG)
+Custom Pred:   gratitude (CORRECT)
+--------------------
+Example 3:
+Text: Madam Speaker, Mr.  Vice President, Members of Congress, the First Lady of the United States, and my fellow Americans:We meet tonight at a moment of unlimited potential.  As we begin a new Congress, I...
+Gold: neutral
+Baseline Pred: optimism (WRONG)
+Custom Pred:   neutral (CORRECT)
+--------------------
+Example 4:
+Text: THE PRESIDENT: Thank you, Lee.  Thank you, Lee.  Thank you. AUDIENCE: USA! USA! USA!THE PRESIDENT: And thank you also to Commander Harman.  We’re grateful for your service, for your leadership, and th...
+Gold: admiration
+Baseline Pred: gratitude (WRONG)
+Custom Pred:   admiration (CORRECT)
+--------------------
+Example 5:
+Text: Mr.  Speaker, Mr.  Vice President, Members of Congress, the First Lady of the United States, and my fellow Americans:Less than 1 year has passed since I first stood at this podium, in this majestic ch...
+Gold: approval
+Baseline Pred: gratitude (WRONG)
+Custom Pred:   approval (CORRECT)
+--------------------
+
+--- REGRESSIONS (Baseline Correct -> Custom Wrong) ---
+Example 1:
+Text: THE PRESIDENT: Thank you to our First Lady, Melania, who has been so incredible.  (Applause. ) Thank you.  And we are blessed to have you as our First Lady.  Really are. It’s great to be back in the b...
+Gold: gratitude
+Baseline Pred: gratitude (CORRECT)
+Custom Pred:   admiration (WRONG)
+--------------------
+Example 2:
+Text: Mr.  Speaker, Mr.  Vice President, Members of Congress, the First Lady of the United States, and Citizens of America:Tonight, as we mark the conclusion of our celebration of Black History Month, we ar...
+Gold: approval
+Baseline Pred: approval (CORRECT)
+Custom Pred:   neutral (WRONG)
+--------------------
+Example 3:
+Text: Vice President Biden, Mr.  Chief Justice,members of the United States Congress, distinguished guests, and fellow citizens:   Each time we gather to inaugurate a President we bear witness to the enduri...
+Gold: approval
+Baseline Pred: approval (CORRECT)
+Custom Pred:   neutral (WRONG)
+--------------------
+Example 4:
+Text: Good evening.   Tonight, I’d like to talk to you about the end of our combat mission in Iraq, the ongoing security challenges we face, and the need to rebuild our nation here at home.  I know this his...
+Gold: approval
+Baseline Pred: approval (CORRECT)
+Custom Pred:   neutral (WRONG)
+--------------------
+Example 5:
+Text: Thank you, everybody.   Please have a seat.   You guys can sit down, too.   (Laughter. ) Let me begin by saying thank you to a few people -- first of all, your outstanding Governor, Bill Ritter.   Ple...
+Gold: gratitude
+Baseline Pred: gratitude (CORRECT)
+Custom Pred:   neutral (WRONG)
+--------------------
+
+--- PERSISTENT ERRORS (Both Wrong) ---
+Example 1:
+Text: PRESIDENT TRUMP:  Thank you very much.   Thank you. Well, thank you all for being here.   We’ve had a tremendous three days in New York, at the United Nations.   I want to thank the Secretary-General....
+Gold: neutral
+Baseline Pred: gratitude
+Custom Pred:   admiration
+--------------------
+Example 2:
+Text: PRESIDENT TRUMP:  Thank you very much.   Mr.  President, Mr.  Secretary-General, distinguished delegates, ambassadors, and world leaders:Seven decades of history have passed through this hall, in all ...
+Gold: approval
+Baseline Pred: gratitude
+Custom Pred:   neutral
+--------------------
+Example 3:
+Text: THE PRESIDENT:  Thank you very much, everybody.   Before we begin, I’d like to just say that we have a large team of very talented people in China.   We’ve had a negotiation going on for about two day...
+Gold: neutral
+Baseline Pred: admiration
+Custom Pred:   approval
+--------------------
+Example 4:
+Text: THE PRESIDENT: Just a short time ago, I had the honor of presiding over the swearing-in of five new great American citizens.  It was a beautiful ceremony and a moving reminder of our nation’s proud hi...
+Gold: neutral
+Baseline Pred: disappointment
+Custom Pred:   approval
+--------------------
+Example 5:
+Text: THE PRESIDENT: Thank you very much.  Thank you everybody.  (Applause. ) Thank you.  Thank you very much.  Thank you, Matt, for that great introduction.  And thank you for this big crowd.  This is incr...
+Gold: neutral
+Baseline Pred: gratitude
+Custom Pred:   gratitude
+--------------------
