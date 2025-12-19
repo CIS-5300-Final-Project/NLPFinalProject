@@ -174,9 +174,7 @@ def main():
 
     # Evaluate Pretrained RoBERTa Model
     pretrained_model_name = "SamLowe/roberta-base-go_emotions"
-    print(f"\n{'='*60}")
-    print(f"Evaluating Pretrained: {pretrained_model_name}")
-    print(f"{'='*60}")
+    print(f"\nEvaluating Pretrained: {pretrained_model_name}")
     try:
         tokenizer = AutoTokenizer.from_pretrained(pretrained_model_name)
         model = AutoModelForSequenceClassification.from_pretrained(pretrained_model_name)
@@ -196,9 +194,7 @@ def main():
         print(f"[ERROR] Failed to evaluate {pretrained_model_name}: {e}")
     
     for model_path in model_files:
-        print(f"\n{'='*60}")
-        print(f"Evaluating: {model_path}")
-        print(f"{'='*60}")
+        print(f"\nEvaluating: {model_path}")
         
         model, tokenizer = get_model_and_tokenizer(model_path, device)
         if model is None:
@@ -216,9 +212,7 @@ def main():
         })
     
     # Print Summary Table
-    print("\n" + "="*60)
-    print("FINAL RESULTS SUMMARY (GoEmotions Test Set)")
-    print("="*60)
+    print("\nFinal Results Summary (GoEmotions Test Set)")
     
     df_results = pd.DataFrame(results)
     if not df_results.empty:
@@ -226,7 +220,7 @@ def main():
         print(df_results.to_string(index=False))
         
         best_model = df_results.iloc[0]
-        print(f"\n🏆 Best Model: {best_model['Model']} (Macro F1: {best_model['Macro F1']:.4f})")
+        print(f"\nBest Model: {best_model['Model']} (Macro F1: {best_model['Macro F1']:.4f})")
     else:
         print("No results to display.")
 

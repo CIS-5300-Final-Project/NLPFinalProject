@@ -79,7 +79,6 @@ def evaluate_roberta_goemotions(df, text_col, device, batch_size=8):
         pred = max(label_probs, key=label_probs.get)
         predictions.append(pred)
     
-    # --- FIX: Ensure the return name matches what generate_error_report looks for ---
     return gold_labels, predictions, "SamLowe/RoBERTa-base-go_emotions"
 
 def evaluate_custom_model(df, text_col, model_path, device):
@@ -184,20 +183,20 @@ def generate_error_report(df, text_col, all_results, output_dir="../output"):
         base_preds = baseline_result['predictions']
         best_preds = best_model_result['predictions']
         
-        # --- SECTION 1: CONFUSION MATRIX (Top Errors) ---
-        f.write("--- TOP 10 CONFUSED PAIRS (Best Model) ---\n")
-        f.write("Format: (True Label) -> (Predicted Label): Count\n")
+        # Confusion Matrix (Top Errors)
+        f.write("Top 10 Confused Pairs (Best Model)\n")
+        f.write("Format: True Label -> Predicted Label: Count\n")
         
         pairs = list(zip(gold, best_preds))
         error_pairs = [p for p in pairs if p[0] != p[1]]
         cnt = Counter(error_pairs)
         
         for (true_l, pred_l), count in cnt.most_common(10):
-            f.write(f"True: [{true_l}] -> Pred: [{pred_l}] : {count} times\n")
+            f.write(f"True: {true_l} -> Pred: {pred_l} : {count} times\n")
         f.write("\n")
 
-        # --- SECTION 2: BASELINE WRONG -> CUSTOM CORRECT (Improvements) ---
-        f.write("--- IMPROVEMENTS (Baseline Wrong -> Custom Correct) ---\n")
+        # Improvements
+        f.write("Improvements (Baseline Wrong -> Custom Correct)\n")
         count = 0
         for i in range(len(gold)):
             if count >= 5: break # Limit examples
@@ -205,14 +204,14 @@ def generate_error_report(df, text_col, all_results, output_dir="../output"):
                 f.write(f"Example {count+1}:\n")
                 f.write(f"Text: {texts[i][:200]}...\n")
                 f.write(f"Gold: {gold[i]}\n")
-                f.write(f"Baseline Pred: {base_preds[i]} (WRONG)\n")
-                f.write(f"Custom Pred:   {best_preds[i]} (CORRECT)\n")
-                f.write("-" * 20 + "\n")
+                f.write(f"Baseline Pred: {base_preds[i]}\n")
+                f.write(f"Custom Pred:   {best_preds[i]}\n")
+                f.write("\n")
                 count += 1
         f.write("\n")
 
-        # --- SECTION 3: BASELINE CORRECT -> CUSTOM WRONG (Regressions) ---
-        f.write("--- REGRESSIONS (Baseline Correct -> Custom Wrong) ---\n")
+        # Regressions
+        f.write("Regressions (Baseline Correct -> Custom Wrong)\n")
         count = 0
         for i in range(len(gold)):
             if count >= 5: break 
@@ -220,13 +219,13 @@ def generate_error_report(df, text_col, all_results, output_dir="../output"):
                 f.write(f"Example {count+1}:\n")
                 f.write(f"Text: {texts[i][:200]}...\n")
                 f.write(f"Gold: {gold[i]}\n")
-                f.write(f"Baseline Pred: {base_preds[i]} (CORRECT)\n")
-                f.write(f"Custom Pred:   {best_preds[i]} (WRONG)\n")
-                f.write("-" * 20 + "\n")
+                f.write(f"Baseline Pred: {base_preds[i]}\n")
+                f.write(f"Custom Pred:   {best_preds[i]}\n")
+                f.write("\n")
                 count += 1
         
-        # --- SECTION 4: BOTH WRONG ---
-        f.write("\n--- PERSISTENT ERRORS (Both Wrong) ---\n")
+        # Persistent Errors
+        f.write("\nPersistent Errors (Both Wrong)\n")
         count = 0
         for i in range(len(gold)):
             if count >= 5: break
@@ -236,7 +235,7 @@ def generate_error_report(df, text_col, all_results, output_dir="../output"):
                 f.write(f"Gold: {gold[i]}\n")
                 f.write(f"Baseline Pred: {base_preds[i]}\n")
                 f.write(f"Custom Pred:   {best_preds[i]}\n")
-                f.write("-" * 20 + "\n")
+                f.write("\n")
                 count += 1
 
     print(f"[SUCCESS] Report written to {filename}")
@@ -275,12 +274,10 @@ def main():
         all_results.append(compute_metrics(g, p, n))
 
     # Print Summary Table
-    print("\n" + "="*60)
+    print("\nModel Performance Summary:")
     print(f"{'Model':<40} {'Acc':>8} {'F1':>8}")
-    print("-" * 60)
     for r in sorted(all_results, key=lambda x: x['f1_macro'], reverse=True):
         print(f"{r['model']:<40} {r['accuracy']:>8.4f} {r['f1_macro']:>8.4f}")
-    print("="*60)
 
     # Generate Error Report
     generate_error_report(df, text_col, all_results, args.output_dir)
